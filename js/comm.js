@@ -25,6 +25,7 @@ var wsChat = new WebSocket("ws://192.168.0.106:8080/comm");
 //var wsChat = new WebSocket("ws://127.0.0.1:8080/comm");
 
 window.addEventListener('load', function(){
+                        
     startCounter();//shows the time spent in room
     
     /*
@@ -50,14 +51,38 @@ window.addEventListener('load', function(){
     ********************************************************************************************************************************
     */
     
+    // NIKOLA LUKIC HARD CODE
+                        if ( wsChat.readyState == 1) {
+                        
+                        console.log("Connected");
+                        
+                        
+                        console.log("SUBSCRIBE ON ROOM");
+                        
+                        //subscribe to room
+                        wsChat.send(JSON.stringify({
+                                                   action: 'subscribe',
+                                                   room: room
+                                                   }));
+                        
+                        showSnackBar("Connected to the chat server!", 15000);
+                        
+                        
+                        }
+                        
+            
+                        
     wsChat.onopen = function(){
+                        
+       console.log("SUBSCRIBE ON ROOM");
+                        
         //subscribe to room
         wsChat.send(JSON.stringify({
             action: 'subscribe',
             room: room
         }));
         
-        showSnackBar("Connected to the chat server!", 5000);
+        showSnackBar("Connected to the chat server!", 15000);
     };
     
     /*
@@ -81,6 +106,9 @@ window.addEventListener('load', function(){
     */
     
     wsChat.onmessage = function(e){
+                        
+                        console.log("onmessage");
+                        
         var data = JSON.parse(e.data);
         
         if(data.room === room){
@@ -264,6 +292,9 @@ window.addEventListener('load', function(){
     
     //TO SEND MESSAGE TO REMOTE
     document.getElementById("chatSendBtn").addEventListener('click', function(e){
+                                                            
+                               console.log("chatSendBtn CLICK");
+                                                            
         e.preventDefault();
         
         var msg = document.getElementById("chatInput").value.trim();
@@ -291,6 +322,9 @@ window.addEventListener('load', function(){
     
     //WHEN ENTER IS PRESSED TO SEND MESSAGE
     document.getElementById("chatInput").addEventListener('keypress', function(e){
+                                                          
+                                                            console.log("chatSendBtn CLICK");
+                                                          
         var msg = this.value.trim();
         
         if((e.which === 13) && msg){
@@ -460,14 +494,18 @@ window.addEventListener('load', function(){
 
 
 function initCall(){
+    
+    
     var callType = this.id === 'initVideo' ? "Video" : "Audio";
     var callerInfo = document.getElementById('callerInfo');
-        
+    
+    
+    console.log("INIT CALL");
     //launch calling modal and await receiver's response by sending initCall to him (i.e. receiver)
     if(checkUserMediaSupport){
         //set media constraints based on the button clicked. Audio only should be initiated by default
         streamConstraints = callType === 'Video' ? {video:{facingMode:'user'}, audio:true} : {audio:true};
-
+              console.log("INIT CALL checkUserMediaSupport");
         //set message to display on the call dialog
         callerInfo.style.color = 'black';
         callerInfo.innerHTML = callType === 'Video' ? 'Video call to Remote' : 'Audio call to Remote';
@@ -875,7 +913,7 @@ function enableCallBtns(){
     //enable dial btns and disable endcall btn
 //    $(".initCall").attr('disabled', false);
 //    $("#terminateCall").attr('disabled', true);
-    
+    console.log("enableCallBtns");
     var initCallElems = document.getElementsByClassName('initCall');
     
     for(var i = 0; i < initCallElems.length; i++){
@@ -937,6 +975,9 @@ function sendChatToSocket(msg, date, msgId){
 */
 
 function handleCallTermination(){
+    
+    console.log("handleCallTermination");
+    
     myPC ? myPC.close() : "";//close connection as well
                     
     //tell user that remote terminated call

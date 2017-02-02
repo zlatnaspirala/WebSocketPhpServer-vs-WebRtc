@@ -62,25 +62,30 @@ class Comm implements MessageComponentInterface {
         $action = $data->action;
         $room = isset($data->room) ? $data->room : "";
         
+        
+        echo("Event : onMessage \n");
+        var_dump($action);
+
         if(($action == 'subscribe') && $room){
             
-            echo("Event : onMessage \n");
-            //subscribe user to room only if he hasn't subscribed
-            
+                       //subscribe user to room only if he hasn't subscribed
+            echo("Event : onMessage  subscribe \n");
+
             //if room exist and user is yet to subscribe, then subscibe him to room
             //OR
             //if room does not exist, create it by adding user to it
             if((array_key_exists($room, $this->rooms) && !in_array($from, $this->rooms[$room])) || !array_key_exists($room, $this->rooms)){                
-                if(isset($this->rooms[$room]) && count($this->rooms[$room]) >= 2){
+                if(isset($this->rooms[$room]) && count($this->rooms[$room]) >= 3){
                     //maximum number of connection reached
                     $msg_to_send = json_encode(['action'=>'subRejected']);
-                
+                echo("Event : onMessage  subscribe subRejected\n");
                     $from->send($msg_to_send);
+                    
                 }
                 
                 else{
                     $this->rooms[$room][] = $from;//subscribe user to room
-                
+                echo("Event : onMessage  subscribe notifyUsersOfConnection \n");
                     $this->notifyUsersOfConnection($room, $from);
                 }
             }
@@ -155,6 +160,7 @@ class Comm implements MessageComponentInterface {
     public function onError(ConnectionInterface $conn, \Exception $e) {
         //echo "An error has occurred: {$e->getMessage()}\n";
 
+         echo("Event : onError \n");
         $conn->close();
     }
     
@@ -176,11 +182,13 @@ class Comm implements MessageComponentInterface {
         //echo "User subscribed to room ".$room ."\n";
 
         $msg_to_broadcast = json_encode(['action'=>'newSub', 'room'=>$room]);
+        echo("Event : notifyUsersOfConnection \n");
 
         //notify user that someone has joined room
         foreach($this->rooms[$room] as $client){
             if ($client !== $from) {
                 $client->send($msg_to_broadcast);
+                   echo("Event : notifyUsersOfConnection SEND  \n");
             }
         }
     }
